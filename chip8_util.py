@@ -9,7 +9,7 @@ def high_byte(value : np.uint16) -> np.uint8:
     """
     Given a 16 bit value 0xABCD, returns 0xAB.
     """
-    return (value & 0xFF) >> 8
+    return (value & 0xFF00) >> 8
 
 def low_byte(value : np.uint16) -> np.uint8:
     """
@@ -49,7 +49,7 @@ def split(value : int) -> list:
     while value > 0:
         rv.append(value & 0xFF)
         value >>= 8
-    return reversed(rv)
+    return list(reversed(rv))
 
 def build_int(byte_list : list) -> int:
     """
@@ -60,8 +60,3 @@ def build_int(byte_list : list) -> int:
         rv = (rv << 8) | byte
     return rv
 
-def strip_non_numeric_words(code : list) -> list:
-    """
-    Returns a list of all the hexadecimal numbers in the list as i
-    """
-    return [np.uint16(int(word, 16)) for word in code if is_hex(word)]
