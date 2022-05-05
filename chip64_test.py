@@ -26,19 +26,6 @@ def test_chip64_reset():
     assert c64.code_ptr == 0
     assert c64.memory_ptr == 0
 
-
-def test_chip64_halt():
-    """
-    Tests the chip64.halt() Method.
-    This test does so by looking for the SystemExit exception I throw then returning,
-    if SystemExit is not thrown then I simply assert False and the test fails.
-    """
-    c64 = chip64.Chip64()
-    c64u.program_exit = unittest.mock.MagicMock()
-    c64.halt()
-    assert c64u.program_exit.called
-
-
 def test_chip64_subroutine_return():
     """
     Tests the chip64.subroutine_return() method.
@@ -326,7 +313,7 @@ def test_chip64_display_register_dec():
     c64u.console_output = unittest.mock.MagicMock()
     c64.display_register_dec(0)
     assert c64u.console_output.called
-    c64u.console_output.assert_called_with(123456789)
+    c64u.console_output.assert_called_with(str(123456789))
 
 
 def test_chip64_display_register_bin():
@@ -401,6 +388,7 @@ def test_chip64_load_registers():
     c64.load_registers(1)
     assert c64.registers[0] == 0xABCD1E44F9D1CC22
     assert c64.registers[1] == 0xFB1957A2C4C2DE55
+    assert c64.memory_ptr == 0x24
 
 
 def test_chip64_input_register_hex():

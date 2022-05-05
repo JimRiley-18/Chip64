@@ -2,17 +2,6 @@ import chip64 as chip64
 import unittest.mock
 
 
-def test_chip64_execute_HALT():
-    """
-    Tests that the chip64.execute() calls halt when a halt opcode is passed.
-    """
-    code = [0, 0]
-    c64 = chip64.Chip64(code)
-    c64.halt = unittest.mock.MagicMock()
-    c64.execute(num_of_cycles=1)
-    assert c64.halt.called
-
-
 def test_chip64_execute_RET():
     """
     Tests that the chip64.execute() method calls subroutine_return when a RET code is passed.
@@ -243,6 +232,13 @@ def test_chip64_execute_SMP():
     c64.execute(num_of_cycles=1)
     assert c64.set_memory_ptr.called
     c64.set_memory_ptr.assert_called_with(0xBCE)
+
+    code = [0xA0, 0x02]
+    c64 = chip64.Chip64(code)
+    c64.set_memory_ptr = unittest.mock.MagicMock()
+    c64.execute(num_of_cycles=1)
+    assert c64.set_memory_ptr.called
+    c64.set_memory_ptr.assert_called_with(0x2)
 
 
 def test_chip64_execute_CPAC():

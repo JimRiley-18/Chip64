@@ -38,13 +38,6 @@ class Chip64:
         """
         self.__init__()
 
-    def halt(self) -> None:
-        """
-        Implements the 0000 opcode.
-        Halts execution of the program.
-        """
-        c64u.program_exit()
-
     def subroutine_return(self) -> None:
         """
         Implements the 01EE opcode.
@@ -179,7 +172,7 @@ class Chip64:
             return
         # The following code assumes that src_Value > 0
         tmp = self.registers[dest_index] & np.uint64(1 << (src_value - 1))
-        if tmp > 0:
+        if tmp != 0:
             self.registers[0xF] = 1
         else:
             self.registers[0xF] = 0
@@ -193,7 +186,7 @@ class Chip64:
             self.registers[0xF] = 0
             return
         tmp = self.registers[dest_index] & np.uint64(1 << (64 - src_value))
-        if tmp > 0:
+        if tmp != 0:
             self.registers[0xF] = 1
         else:
             self.registers[0xF] = 0
@@ -245,7 +238,7 @@ class Chip64:
         Prints the contents of the register_index register to the console in
         decimal.
         """
-        c64u.console_output(self.registers[register_index])
+        c64u.console_output(str(self.registers[register_index]))
 
     def display_register_bin(self, register_index: np.uint16) -> None:
         """
@@ -292,12 +285,10 @@ class Chip64:
         pointed to by memory_ptr in a big endian manner without modifying
         memory_ptr.
         """
-        ptr = self.memory_ptr
         for register in range(register_index + 1):
             # 8 being the width of a register in bytes.
-            tmp_bytes = [self.memory[ptr + i] for i in range(8)]
-            ptr += 8
-            self.registers[register] = np.uint64(c64u.build_uint64(tmp_bytes))
+            tmp_bytes = [self.memory[self.memory_ptr + 8*register + i] for i in range(8)]
+            self.registers[register] = c64u.build_uint64(tmp_bytes)
 
     def input_to_register_hex(self, register_index: np.uint16) -> None:
         """
@@ -346,8 +337,8 @@ class Chip64:
             # This prevents irritating -2 terms in code_ptr modifying instructions.
             code_ptr_increment_flag = True
 
-            if opcode == 0x0000:
-                self.halt()
+            if opcode == 0x0000: # pragma: no cover
+                return
             elif opcode == 0x01EE:
                 self.subroutine_return()
                 code_ptr_increment_flag = True

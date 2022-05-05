@@ -22,13 +22,15 @@ c64.execute()
 
 This program simply reads a number in from the console in decimal then prints that number in binary.
 
+The `Chip64` library requires the `numpy` python library as an external dependency.
+
 
 ## How-To Guides
 
 ### How to Write Opcodes
 
 `Chip64` uses a fixed width 16-bit instruction format stored high order byte first.
-This means that the instruction 0x81E1 is represented as follows:
+This means that the instruction 81E1 is represented as follows:
 
 ```python
 instruction =  [0x81, 0xE1]
@@ -316,7 +318,7 @@ SMP sets the memory address to constant NNN. This is demonstrated below:
 
 ```python
 code = [
-    0xAA, 0XBC # memory pointer = 0xABC
+    0xAA, 0xBC # memory pointer = 0xABC
 ]
 ```
 
@@ -340,7 +342,7 @@ LOAD reads from the memory pointed to by the memory pointer and writes these dat
 
 ```python
 code = [
-    0xE6, 0x65 # load from memory pointer to registers 0 to X inclusive.
+    0xE6, 0x65 # load from memory pointer to registers 0 to 6 inclusive.
 ]
 ```
 
@@ -352,7 +354,33 @@ Upon encountering a 0000 opcode, the program will terminate. This opcode is repr
 
 ### Chip64 Architectural Specification
 
+The architecture is detailed below:
 
+ - 16 64-bit registers
+ - 1 12-bit program counter
+ - 1 12-bit memory pointer
+ - 4096 byte address space
+ - call stack of 12-bit addressses with a depth of a minimum of 16 addresses.
+
+The initial values that all registers and memory bytes take is unspecified, therefore one should not reply on the emulator to zero these data
+for maximum portability.
+
+Program execution begins from memory address 0, therefore if one wants to place subroutines at the beginning of the address space then the programmer is mandated to make the initial instruction and unconditional jump to the address where your main code begins.
+
+### Value Signedness
+
+All register and address space values are unsigned.
+
+### Carry and Borrow
+
+In the addition and subtraction instructions, the terms carry and borrow were defined.
+
+Carry is defined as being when two given addition operands give a result that is too large to fit in a register.
+For example, if I try to evaluate 0xFF + 0xFF in 8-bit arithmetic. then the result given is 0x1FE, which is too large to fit in an 8-bit register.
+To indicate this to the programmer, a carry flag is set, in this case it is registers[0xF]. And the truncated 8-bit value 0xFE is given as the result of the addition.
+
+Borrow is defined similarly as when two given subtraction operands give a result that is too small to fit in a register.
+For example, if I try to evaluate 0 - 1 in 8 bit arithmetic. This is outside the range 0 - 0xFF so the value wraps around to the value 0xFF and so this needs to be indicated by a borrow flag.
 
 ## References
 
@@ -360,9 +388,8 @@ Upon encountering a 0000 opcode, the program will terminate. This opcode is repr
 
 This software exposes the `Chip64` object through which the user interacts with the system through the `Chip64::execute()` function.
 
-
 Due to `Python`'s object oriententation model, there are a litany of internal implementation methods which are also exposed.
-These methods should not be relied upon, nor should any code depend on the internal representation of the architecture as implemented in this library.
+These methods should not be relied upon, nor should any code depend on any undocumented behaviour of the library.
 
 ### Bibliography
 
