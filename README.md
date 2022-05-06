@@ -12,8 +12,8 @@ Observe the bytecode below:
 import chip64
 
 code = [
-    0xF0, 0x01,
-    0xD0, 0x02
+    0xF0, 0x01, # r0 = input()
+    0xD0, 0x02  # print(r0, hex)
 ]
 
 c64 = chip64.Chip64(code)
