@@ -1,5 +1,7 @@
-# Chip64
+# Deprecated
+## If you are interested, please goto: https://github.com/Jimmer1/JRChip16
 
+# Chip64
 A modification of the popular Chip8 virtual machine with adjustments to ease writing mathematical programs.
 
 
